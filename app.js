@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res, next) => {
-  res.send("Welcome to twitter bot server backend");
+  res.send("Welcome to twitter bot server!");
 });
 
 app.listen(PORT, () => {
