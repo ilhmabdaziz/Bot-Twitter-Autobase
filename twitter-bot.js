@@ -68,32 +68,41 @@ class TwitterBot {
   getDirectMessage = (userId) => {
     return new Promise((resolve, reject) => {
       this.T.get("direct_messages/events/list", async (error, data) => {
-        if (!error) {
-          // console.log(userId, "USER ID  <<<<<<<");
-          const messages = data.events;
-          const receivedMessages = this.getReceivedMessages(messages, userId);
-          const unnecessaryMessages = this.getUnnecessaryMessages(
-            receivedMessages,
-            this.triggerWord
-          );
-          const triggerMessages = this.getTriggerMessages(
-            receivedMessages,
-            this.triggerWord
-          );
-          // console.log(
-          //   JSON.stringify(unnecessaryMessages, null, 3),
-          //   "unnes messages <<<<"
-          // );
-          // console.log(
-          //   JSON.stringify(triggerMessages, null, 3),
-          //   "trigger messages <<<<"
-          // );
+        try {
+          if (!error) {
+            let lastMessage = {};
+            // console.log(userId, "USER ID  <<<<<<<");
+            const messages = data.events;
+            const receivedMessages = this.getReceivedMessages(messages, userId);
+            const unnecessaryMessages = this.getUnnecessaryMessages(
+              receivedMessages,
+              this.triggerWord
+            );
+            const triggerMessages = this.getTriggerMessages(
+              receivedMessages,
+              this.triggerWord
+            );
+            // console.log(
+            //   JSON.stringify(unnecessaryMessages, null, 3),
+            //   "unnes messages <<<<"
+            // );
+            console.log(
+              JSON.stringify(triggerMessages, null, 3),
+              "trigger messages <<<<"
+            );
 
-          await this.deleteUnnecessaryMessages(unnecessaryMessages);
+            await this.deleteUnnecessaryMessages(unnecessaryMessages);
+            await this.deleteMoreThan280CharMsgs(triggerMessages);
+            if (triggerMessages[0]) {
+              lastMessage = triggerMessages[triggerMessages.length - 1];
+            }
 
-          resolve(data);
-        } else {
-          reject("error on get direct message");
+            resolve(lastMessage);
+          } else {
+            reject("error on get direct message");
+          }
+        } catch (error) {
+          throw error;
         }
       });
     });
@@ -111,6 +120,34 @@ class TwitterBot {
         await this.deleteMessage(msg);
         await this.sleep(2000);
       }
+    }
+  };
+
+  deleteMoreThan280CharMsgs = async (triggerMessages) => {
+    try {
+      let moreThan280 = [];
+      for (const [i, msg] of triggerMessages.entries()) {
+        let text = msg.message_create.message_data.text;
+        const attachment = msg.message_create.message_data.attachment;
+        if (attachment) {
+          const shortUrl = attachment.media.url;
+          text = text.split(shortUrl)[0];
+        }
+        if (text.length > 280) {
+          moreThan280.push(msg);
+          await this.deleteMessage(msg);
+          await this.sleep(2000);
+        }
+        if (i + 1 === 3) {
+          break;
+        }
+      }
+      for (const msg of moreThan280) {
+        const idx = triggerMessages.indexOf(msg);
+        triggerMessages.splice(idx, 1);
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
