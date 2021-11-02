@@ -1,4 +1,5 @@
 const express = require("express");
+const CronJob = require("cron").CronJob;
 const app = express();
 
 const { TwitterBot } = require("./twitter-bot");
@@ -11,6 +12,11 @@ const twitterBot = new TwitterBot({
   access_token: "1351298635409944577-vL64XD1BYEywIcnNScobSb7sMjlyyd",
   access_token_secret: "2QxpyVxZyIrlLpcM7hRGe7s0nyuPnwIvduZr8pMw0Y0Vd",
 });
+
+const job = new CronJob("*/2 * * * * *", doJob, null, true);
+function doJob() {
+  console.log("Ketrigger nih...!");
+}
 
 app.get("/", (req, res, next) => {
   res.send("Welcome to twitter bot server!");
