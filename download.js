@@ -35,11 +35,14 @@ const OAuthHelper = (mediaUrl) => {
 const downloadMedia = async (mediaUrl, fileName) => {
   try {
     const authorization = OAuthHelper(mediaUrl);
+    console.log("Download media ...........");
     const { data } = await axios.get(mediaUrl, {
       headers: authorization,
       responseType: "arraybuffer",
     });
+    // console.log(mediaUrl, "media url <<<<<<<<<<<<<<");
     fs.writeFileSync(fileName, data);
+    console.log("Media has been successfuly downloaded .....");
     return data;
   } catch (error) {
     throw new Error("error from dwonloading media.");
