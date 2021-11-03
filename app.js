@@ -19,7 +19,7 @@ async function doJob() {
   try {
     const authenticatedUserId = await bot.getAdminUserInfo();
     const message = await bot.getDirectMessage(authenticatedUserId);
-    // console.log(message, "akhirnya dapat <<<<<<<");
+    // console.log(JSON.stringify(message, null, 3, "akhirnya dapat <<<<<<<"));
     if (message.id) {
       await bot.tweetMessage(message);
     } else {
