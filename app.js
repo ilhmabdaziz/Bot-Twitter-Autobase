@@ -15,19 +15,27 @@ const bot = new TwitterBot({
 });
 
 const job = new CronJob("*/2 * * * * *", doJob, null, false);
+
 async function doJob() {
+  let tempMessage;
   try {
     const authenticatedUserId = await bot.getAdminUserInfo();
     const message = await bot.getDirectMessage(authenticatedUserId);
     // console.log(JSON.stringify(message, null, 3, "akhirnya dapat <<<<<<<"));
     if (message.id) {
+      tempMessage = message;
       await bot.tweetMessage(message);
+      await bot.deleteMessage(message);
+      console.log("message has been deleted from twitter ...");
     } else {
       console.log("no tweet to post -----------------------");
     }
   } catch (error) {
     console.log(error);
     console.log("-------------- ERROR ---------------");
+    if (tempMessage.id) {
+      await bot.deleteMessage(tempMessage);
+    }
   }
 }
 
