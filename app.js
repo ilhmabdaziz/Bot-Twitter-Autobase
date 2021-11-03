@@ -22,7 +22,7 @@ const bot = new TwitterBot({
   // triggerWord: "sayaang",
 });
 
-const job = new CronJob("0 */1 * * * *", doJob, null, false);
+const job = new CronJob("0 */1 * * * *", doJob, null, true);
 
 async function doJob() {
   let tempMessage;
@@ -32,15 +32,19 @@ async function doJob() {
     // console.log(JSON.stringify(message, null, 3, "akhirnya dapat <<<<<<<"));
     if (message.id) {
       tempMessage = message;
-      await bot.tweetMessage(message);
-      await bot.deleteMessage(message);
-      console.log("message has been deleted from twitter ...");
+      const { data } = await bot.tweetMessage(message);
+      const response = await bot.deleteMessage(message);
+      console.log(
+        `... DM has been successfuly reposted with id : ${data.id} @ ${data.created_at}`
+      );
+      console.log("-----------------------------------------");
     } else {
-      console.log("no tweet to post -----------------------");
+      console.log("no tweet to post");
+      console.log("-----------------------------------------");
     }
   } catch (error) {
-    console.log(error);
-    console.log("-------------- ERROR ---------------");
+    console.log(error, "ERROR.");
+    console.log("-----------------------------------------");
     if (tempMessage.id) {
       await bot.deleteMessage(tempMessage);
     }

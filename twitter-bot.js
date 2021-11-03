@@ -153,6 +153,7 @@ class TwitterBot {
         };
 
         if (attachment) {
+          const media = attachment.media;
           const shortUrl = attachment.media.url;
           payload.status = text.split(shortUrl)[0];
 
