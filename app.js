@@ -16,12 +16,19 @@ const bot = new TwitterBot({
 
 const job = new CronJob("*/2 * * * * *", doJob, null, false);
 async function doJob() {
-  const authenticatedUserId = await bot.getAdminUserInfo();
-  const dm = await bot.getDirectMessage(authenticatedUserId);
-  // console.log(dm);
-  // for (const message of dm.events) {
-  //   console.log(message.message_create, "<<<< msg");
-  // }
+  try {
+    const authenticatedUserId = await bot.getAdminUserInfo();
+    const message = await bot.getDirectMessage(authenticatedUserId);
+    // console.log(message, "akhirnya dapat <<<<<<<");
+    if (message.id) {
+      await bot.tweetMessage(message);
+    } else {
+      console.log("no tweet to post -----------------------");
+    }
+  } catch (error) {
+    console.log(error);
+    console.log("-------------- ERROR ---------------");
+  }
 }
 
 app.get("/", (req, res, next) => {

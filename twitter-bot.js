@@ -86,10 +86,10 @@ class TwitterBot {
             //   JSON.stringify(unnecessaryMessages, null, 3),
             //   "unnes messages <<<<"
             // );
-            console.log(
-              JSON.stringify(triggerMessages, null, 3),
-              "trigger messages <<<<"
-            );
+            // console.log(
+            //   JSON.stringify(triggerMessages, null, 3),
+            //   "trigger messages <<<<"
+            // );
 
             await this.deleteUnnecessaryMessages(unnecessaryMessages);
             await this.deleteMoreThan280CharMsgs(triggerMessages);
@@ -102,7 +102,32 @@ class TwitterBot {
             reject("error on get direct message");
           }
         } catch (error) {
-          throw error;
+          reject(error);
+        }
+      });
+    });
+  };
+
+  // Tweet Message
+  tweetMessage = (message) => {
+    return new Promise((resolve, reject) => {
+      const text = message.message_create.message_data.text;
+
+      const payload = {
+        status: text,
+      };
+
+      this.T.post("statuses/update", payload, (error, data) => {
+        if (!error) {
+          console.log(
+            `successfuly posting new status with DM id ${message.id}`
+          );
+          resolve({
+            message: `successfuly posting new status with DM id ${message.id}`,
+            data,
+          });
+        } else {
+          reject(error);
         }
       });
     });
@@ -123,6 +148,7 @@ class TwitterBot {
     }
   };
 
+  // Delete > 280 char
   deleteMoreThan280CharMsgs = async (triggerMessages) => {
     try {
       let moreThan280 = [];
