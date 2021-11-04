@@ -25,6 +25,7 @@ const bot = new TwitterBot({
 const job = new CronJob("0 */1 * * * *", doJob, null, true);
 
 async function doJob() {
+  console.log(`execute @ ${new Date().toTimeString()}`);
   let tempMessage;
   try {
     const authenticatedUserId = await bot.getAdminUserInfo();
